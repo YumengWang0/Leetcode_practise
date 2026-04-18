@@ -1,4 +1,19 @@
+
+
+
+
 # LeetCode Practice Log 
+
+---
+
+
+## Leetcode count 
+
+Hard: 
+
+Medium: 
+
+Easy: 
 
 ---
 
