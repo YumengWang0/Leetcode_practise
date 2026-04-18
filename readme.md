@@ -40,7 +40,6 @@
 | X | 142 | Linked List Cycle | Medium | Fast and Slow Pointers | ⭐⭐ | iteration ensure fast and fast.next is not None, set slow =head , fast = head| 
 | X | 19 | Remove Nth Node From End of List | Medium | Fast and Slow Pointers | ⭐⭐ | Using the mapping to find the previous one before the removed one// using the fast pointer moved first n steps, and until it reches to the end. Need to set the dummy nodes. |
 | ✅  | 876 | Middle of the Linked List | Easy | Fast and Slow Pointers | ⭐ | |
-
 | ✅ | 83 | Remove Duplicates from Sorted List | Easy | Pointer Update | ⭐ | The list has been sorted |
 
 
