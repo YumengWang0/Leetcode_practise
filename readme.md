@@ -9,23 +9,79 @@
 | 2026-04-17  | 2 | 1 | 0 | 3 | focused on array |
 
 | 2026-04-18  |  5  + 2|  2 | 0  | 9  | 7 Listnode  + 2 array|
-| 2026-04-19  |   |   |   |   |   |
+| 2026-04-19  |  2 |  3  |  1  |   | 6 merge sorting + stack |
 | 2026-04-20  |   |   |   |   | |
 | 2026-04-21  |   |   |   |   | |
 | 2026-04-22  |   |   |   |   |  |
  
+
+⭐ → 秒杀
+⭐⭐ → 小问题
+⭐⭐⭐ → 没思路
+⭐⭐⭐⭐ → 看答案
+⭐⭐⭐⭐⭐ → 
+
 -----
 
-## Array
+## Merge sorting, divide and conquer 
 | Status | # | Problem | Difficulty | Pattern | ⭐ Confidence | Notes |
 |--------|---|--------|-----------|---------|--------------|------|
-| ✅  | 1 | Two Sum | Easy | HashMap / Array | ⭐ | |
-| ✅  | 167 | Two Sum II | Easy | two pointer / Array | ⭐ | The order is important |
-| ☐ | 88 | Merge Sorted Array | Easy | Two Pointers | ⭐ | |
-| ☐ | 53 | Maximum Subarray | Medium | DP / Kadane | ⭐ | |
+| ✅ | 912 | Sort an Array | Medium | Merge Sort / Divide & Conquer | ⭐ | 基础归并排序，必须手写 |
+
+| X | 88 | Merge Sorted Array | Easy | Merge / Two Pointers | ⭐⭐ | 从后往前填 |
+| X | 148 | Sort List | Medium | Merge Sort / Linked List / Fast-Slow | ⭐⭐  | 链表归并排序🔥 |
+| ✅| 23 | Merge k Sorted Lists | Hard | Divide & Conquer / Heap | ⭐ | 两两 merge 或 heap |
+| X | 53 | Maximum Subarray | Medium | Divide & Conquer | ⭐⭐⭐ | 分治思路理解( using the pointer for the comparison cross left and right part) and it can use the prefix  / DP / Kadane  |
+
+| ✅ | 169 | Majority Element | Easy | Divide & Conquer | ⭐ | 左右 majority 合并 |
+| ☐ | 315 | Count of Smaller Numbers After Self | Hard | Merge Sort + Counting | ⭐ | OA 高频🔥 |
+| ☐ | 493 | Reverse Pairs | Hard | Merge Sort + Counting | ⭐ | 经典变形🔥 |
+| ☐ | 327 | Count of Range Sum | Hard | Prefix Sum + Merge Sort | ⭐ | 面试高频 |
 
 
-| ☐ | 121 | Best Time to Buy and Sell Stock | Easy | Greedy / Array | ⭐ | |
+
+## Stack 
+| Status | #   | Problem                        | Difficulty | Pattern | ⭐ Confidence | Notes |
+| ------ | --- | ------------------------------ | ---------- | ------- | ------------ | ----- |
+| ☐      | 20  | Valid Parentheses              | Easy       | Stack   | ⭐⭐⭐          | 入门必做  |
+| ☐      | 155 | Min Stack                      | Easy       | Stack设计 | ⭐⭐⭐          | 高频    |
+| ☐      | 232 | Implement Queue using Stacks   | Easy       | Stack模拟 | ⭐⭐           | 理解结构  |
+| ☐      | 394 | Decode String                  | Medium     | Stack   | ⭐⭐⭐          | 高频    |
+| ☐      | 739 | Daily Temperatures             | Medium     | 单调栈     | ⭐⭐⭐⭐         | 必背    |
+| ☐      | 496 | Next Greater Element I         | Easy       | 单调栈     | ⭐⭐⭐          | 模板    |
+| ☐      | 503 | Next Greater Element II        | Medium     | 单调栈     | ⭐⭐⭐⭐         | 环形    |
+| ☐      | 84  | Largest Rectangle in Histogram | Hard       | 单调栈     | ⭐⭐⭐⭐⭐        | 面试杀手  |
+| ☐      | 42  | Trapping Rain Water            | Hard       | 单调栈/双指针 | ⭐⭐⭐⭐⭐        | 高频    |
+
+
+## queue 
+| Status | #   | Problem                           | Difficulty | Pattern | ⭐ Confidence | Notes |
+| ------ | --- | --------------------------------- | ---------- | ------- | ------------ | ----- |
+| ☐      | 933 | Number of Recent Calls            | Easy       | Queue   | ⭐⭐           | 入门    |
+| ☐      | 225 | Implement Stack using Queues      | Easy       | Queue模拟 | ⭐⭐           |       |
+| ☐      | 102 | Binary Tree Level Order Traversal | Medium     | BFS     | ⭐⭐⭐⭐         | 必背    |
+| ☐      | 200 | Number of Islands                 | Medium     | BFS/DFS | ⭐⭐⭐⭐         | 高频    |
+| ☐      | 994 | Rotting Oranges                   | Medium     | BFS     | ⭐⭐⭐⭐         | 模板题   |
+| ☐      | 127 | Word Ladder                       | Hard       | BFS     | ⭐⭐⭐⭐⭐        | 面试经典  |
+| ☐      | 239 | Sliding Window Maximum            | Hard       | 单调队列    | ⭐⭐⭐⭐⭐        | 必背    |
+| ☐      | 542 | 01 Matrix                         | Medium     | BFS     | ⭐⭐⭐⭐         | 多源BFS |
+| ☐      | 286 | Walls and Gates                   | Medium     | BFS     | ⭐⭐⭐⭐         |       |
+
+
+ 
+
+
+
+
+---- 
+## Array
+| Status | #   | Problem                         | Difficulty | Pattern         | ⭐ Confidence | Notes                  |
+| ------ | --- | ------------------------------- | ---------- | --------------- | ------------ | ---------------------- |
+| ✅      | 1   | Two Sum                        | Easy       | HashMap / Array | ⭐            |                        |
+| ✅      | 167 | Two Sum II                     | Easy       | Two Pointers    | ⭐            | The order is important |
+| ☐      | 88  | Merge Sorted Array              | Easy       | Two Pointers    | ⭐            |                        |
+| ☐      | 53  | Maximum Subarray                | Medium     | DP / Kadane     | ⭐            |                        |
+| ☐      | 121 | Best Time to Buy and Sell Stock | Easy       | Greedy / Array  | ⭐            |                        |
 
 
 ---
