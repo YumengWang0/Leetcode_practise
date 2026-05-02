@@ -112,3 +112,19 @@ O(N log N)
 
 3. heap sort 是否稳定？
 → ❌ 不稳定
+
+
+
+问题： 
+1. 合并K个有序listnode ：  弹出head head。next 是下一个
+用小根堆 排好序。小根队个数。
+given head
+    【3 6 9 12】 
+    1 8 24
+
+    3 5 7 13 
+
+    1 3 5   
+
+
+

@@ -21,7 +21,27 @@
 ⭐⭐⭐⭐ → 看答案
 ⭐⭐⭐⭐⭐ → 
 
------
+
+
+| Status | #   | Problem                                | Difficulty | Pattern                 | ⭐ Confidence | Notes           |
+| ------ | --- | -------------------------------------- | ---------- | ----------------------- | ------------ | --------------- |
+| ✔      | 509 | Fibonacci Number                       | Easy       | Linear DP / Recurrence  | ⭐⭐⭐⭐⭐        | 最基础 DP + 空间优化模板 |
+| ✔      | 70  | Climbing Stairs                        | Easy       | Fibonacci Variant       | ⭐⭐⭐⭐⭐        | 经典“跳台阶”         |
+| ✔      | 198 | House Robber（臭鼬问题）                     | Medium     | Take / Not Take         | ⭐⭐⭐⭐⭐        | 相邻约束 DP         |
+| ✔      | 213 | House Robber II                        | Medium     | Circular DP             | ⭐⭐⭐⭐         | 环形数组（首尾不能同时取）   |
+| ✔      | 91  | Decode Ways                            | Medium     | String DP               | ⭐⭐⭐⭐⭐        | 单/双字符拆分         |
+| ✔      | 639 | Decode Ways II                         | Hard       | Combinatorial DP        | ⭐⭐⭐⭐         | `*` 多情况分类       |
+| ✔      | 115 | Distinct Subsequences                  | Hard       | Subsequence DP          | ⭐⭐⭐⭐⭐        | 二维DP + 1D优化     |
+| ✔      | 940 | Distinct Subsequences II               | Hard       | Subsequence Counting DP | ⭐⭐⭐⭐         | 去重子序列计数         |
+| ✔      | 983 | Minimum Cost For Tickets               | Medium     | Cost DP (interval jump) | ⭐⭐⭐⭐⭐        | 1/7/30天跳转       |
+| ✔      | 467 | Unique Substrings in Wraparound String | Medium     | DP by character ending  | ⭐⭐⭐⭐         | 字符结尾最长连续串       |
+
+
+
+
+
+
+---
 
 ## Merge sorting, divide and conquer 
 | Status | # | Problem | Difficulty | Pattern | ⭐ Confidence | Notes |
