@@ -1,0 +1,1072 @@
+# 递归学习笔记 (Recursion Notes)
+
+---
+
+## 目录
+
+- [第一章：递归基础](#第一章递归基础)
+  - [1.1 递归的本质](#11-递归的本质)
+  - [1.2 递归 / DFS / BFS 的关系](#12-递归--dfs--bfs-的关系)
+  - [1.3 递归终止条件怎么想](#13-递归终止条件怎么想)
+  - [1.4 带路径的递归 vs 不带路径的递归](#14-带路径的递归-vs-不带路径的递归)
+  - [1.5 递归 vs 回溯的区别](#15-递归-vs-回溯的区别)
+- [第二章：子集 / 子序列类题目](#第二章子集--子序列类题目)
+  - [2.1 返回字符串全部子序列（去重）](#21-返回字符串全部子序列去重)
+  - [2.2 LC 90 子集 II（数组子集去重）](#22-lc-90-子集-ii数组子集去重)
+- [第三章：组合类题目](#第三章组合类题目)
+  - [3.1 组合的核心思路](#31-组合的核心思路)
+  - [3.2 LC 39 组合总和（元素可重复使用）](#32-lc-39-组合总和元素可重复使用)
+  - [3.3 LC 40 组合总和 II（元素不可重复使用，结果去重）](#33-lc-40-组合总和-ii元素不可重复使用结果去重)
+- [第四章：排列类题目](#第四章排列类题目)
+  - [4.1 LC 46 全排列（无重复数值）](#41-lc-46-全排列无重复数值)
+  - [4.2 LC 47 全排列 II（有重复数值，结果去重）](#42-lc-47-全排列-ii有重复数值结果去重)
+- [第五章：递归经典题](#第五章递归经典题)
+  - [5.1 递归逆序一个栈](#51-递归逆序一个栈)
+  - [5.2 用递归给栈排序](#52-用递归给栈排序)
+  - [5.3 汉诺塔问题](#53-汉诺塔问题)
+- [第六章：总结与选题指南](#第六章总结与选题指南)
+- [第七章：练习代码整理（组合 + 排列）](#第七章练习代码整理组合--排列)
+  - [7.1 LC 77 组合](#71-lc-77-组合)
+  - [7.2 LC 39 组合总和](#72-lc-39-组合总和)
+  - [7.3 LC 40 组合总和 II](#73-lc-40-组合总和-ii)
+  - [7.4 LC 46 全排列](#74-lc-46-全排列)
+  - [7.5 LC 47 全排列 II](#75-lc-47-全排列-ii)
+  - [7.6 组合 vs 排列 完整对比总结](#76-组合-vs-排列-完整对比总结)
+
+---
+
+## 第一章：递归基础
+
+### 1.1 递归的本质
+
+递归做一件事：**把大问题拆成同类型的小问题**。
+
+**递归函数的两个必要部分：**
+
+```python
+def f(问题):
+    # 1. base case（终止条件）：问题小到可以直接回答
+    if 最小情况:
+        return 直接答案
+
+    # 2. 递归体：把问题缩小，调用自己
+    return 用 f(更小的问题) 拼出答案
+```
+
+**判断能否用递归的三个特征：**
+
+```
+1. 问题可以拆成"同类型的子问题"
+   → f(n) 的答案依赖 f(n-1) 或 f(子问题)
+
+2. 子问题有清晰的"缩小方向"
+   → 每次递归，问题规模必须变小（否则无限递归）
+
+3. 存在明确的 base case
+   → 最小的问题可以直接回答，不需要再拆
+```
+
+**调用栈示意（以 factorial 为例）：**
+
+```
+f(4)
+  → 4 * f(3)
+        → 3 * f(2)
+              → 2 * f(1)
+                    → return 1   ← base case
+              ← 2 * 1 = 2
+        ← 3 * 2 = 6
+  ← 4 * 6 = 24
+```
+
+> 递归 = **从复杂到简单**（top-down），拆到 base case，再原路返回。
+
+---
+
+### 1.2 递归 / DFS / BFS 的关系
+
+这三个不是同一层的概念：
+
+```
+递归（Recursion）
+  → 编程技巧：函数调用自己
+  → 用于实现 DFS，也用于分治、DP 等
+
+DFS（深度优先搜索）
+  → 遍历策略：一条路走到底，再回头
+  → 实现：通常用递归（也可以用显式栈）
+
+BFS（广度优先搜索）
+  → 遍历策略：一层一层向外扩散
+  → 实现：必须用队列，不用递归
+```
+
+**一句话关系：**
+
+```
+DFS 通常用递归实现
+BFS 用队列实现，不用递归
+递归不一定是 DFS（分治、数学递推也用递归）
+```
+
+---
+
+### 1.3 递归终止条件怎么想
+
+**你的问题**：怎么判断递归什么时候终止？
+
+**通用方法：想"最小的合法输入是什么"**
+
+```
+问题               最小输入           base case
+─────────────────────────────────────────────────
+字符串子序列       字符串为空          返回 [""]
+组合/排列          路径长度达到要求    收集当前路径，返回
+树的遍历           节点为 None         返回
+二分查找           left > right        返回 -1（找不到）
+汉诺塔             n == 1              直接移动，返回
+```
+
+**通用口诀：**
+
+```
+1. 索引越界 → return（数组/字符串走完了）
+2. 路径满足条件 → 收集结果，return
+3. 节点为空 → return（树/图遍历）
+4. 规模为 0 或 1 → 直接返回答案
+```
+
+**以子序列为例：**
+
+```python
+def dfs(i, path):
+    if i == len(s):       # ← 索引走到头，字符串处理完了
+        result.append(path)
+        return
+    # 要 s[i]
+    dfs(i+1, path + s[i])
+    # 不要 s[i]
+    dfs(i+1, path)
+```
+
+> **关键**：base case 是递归的"出口"，写之前先问自己：
+> "当问题缩小到什么程度，我可以直接给出答案？"
+
+---
+
+### 1.4 带路径的递归 vs 不带路径的递归
+
+这是你笔记里的核心分类：
+
+| | 带路径的递归（DFS）| 不带路径的递归（DP） |
+|---|---|---|
+| 路径影响结果？ | ✅ 影响（走过的不能再走）| ❌ 不影响 |
+| 状态能用坐标表达？ | ❌ 需要记录整条路径 | ✅ dp[i][j] 就够了 |
+| 有重复子问题？ | ❌ 极少 | ✅ 大量重复 |
+| 能做成 DP？ | ❌ 不能 | ✅ 能 |
+| 例子 | 单词搜索、全排列、子集 | 最小路径和、LCS、背包 |
+
+```
+遇到递归：
+  问自己 → 有没有大量重复子问题？
+    有  → 加 memo → 改成 DP
+    没有 → 纯 DFS 回溯（路径类问题）
+```
+
+---
+
+### 1.5 递归 vs 回溯的区别
+
+**你的问题**：回溯和递归有什么区别？
+
+```
+递归（Recursion）：
+  → 是一种技巧，函数调用自己
+  → 不一定需要"恢复现场"
+
+回溯（Backtracking）：
+  → 是递归的一种特殊形式
+  → 核心特征：做选择 → 递归 → 撤销选择（恢复现场）
+  → 用于：枚举所有可能路径，走错了要回退
+```
+
+**回溯的模板：**
+
+```python
+def backtrack(路径, 选择列表):
+    if 满足终止条件:
+        收集结果
+        return
+
+    for 选择 in 选择列表:
+        做选择              # 修改状态
+        backtrack(路径, 新选择列表)
+        撤销选择            # 恢复状态  ← 这是回溯的关键
+```
+
+**具体例子：**
+
+```python
+# 全排列（有撤销，是回溯）
+path.append(num)        # 做选择
+dfs(...)
+path.pop()              # 撤销选择 ← 回溯
+
+# 树的遍历（无需撤销，是普通递归）
+dfs(node.left)
+dfs(node.right)
+# 不需要恢复任何状态
+```
+
+> **一句话**：回溯 = 递归 + 撤销选择。所有回溯都是递归，但不是所有递归都是回溯。
+
+---
+
+## 第二章：子集 / 子序列类题目
+
+### 2.1 返回字符串全部子序列（去重）
+
+**题目**：给字符串 `s`，返回所有子序列（顺序不变，字符可以不连续），去除重复。
+
+**核心思路：要 or 不要**
+
+```
+对 s 的每一个字符，做两个决定：
+  1. 要这个字符 → 加入路径
+  2. 不要这个字符 → 跳过
+
+s = "abc"
+                ""
+           /         \
+         "a"          ""
+        /   \        /   \
+      "ab"  "a"    "b"   ""
+      / \   / \   / \   / \
+    abc ab ac  a bc  b  c  ""
+```
+
+**终止条件**：`i == len(s)`，字符串处理完了，收集当前路径。
+
+```python
+def allSubsequences(s):
+    result = []
+    path = []
+
+    def dfs(i):
+        if i == len(s):            # base case：处理完所有字符
+            result.append(''.join(path))
+            return
+
+        # 选择1：要 s[i]
+        path.append(s[i])
+        dfs(i + 1)
+        path.pop()                 # 回溯，撤销选择
+
+        # 选择2：不要 s[i]
+        dfs(i + 1)
+
+    dfs(0)
+    return result
+```
+
+**去重**：用 `HashSet` 过滤，或者在决策树剪枝。
+
+```python
+def allSubsequencesUnique(s):
+    result = set()                 # ← 用 set 自动去重
+    path = []
+
+    def dfs(i):
+        if i == len(s):
+            result.add(''.join(path))  # set 自动去重
+            return
+        path.append(s[i])
+        dfs(i + 1)
+        path.pop()
+        dfs(i + 1)
+
+    dfs(0)
+    return list(result)
+```
+
+**复杂度**：O(2^n × n)，每个字符要或不要，共 2^n 种子序列，每个长度最多 n。
+
+---
+
+### 2.2 LC 90 子集 II（数组子集去重）
+
+**题目**：给含重复数字的数组，返回所有子集，去除重复。
+
+**去重的关键：先排序，同层相同元素只用第一个。**
+
+```
+nums = [1, 2, 2]，排序后 [1, 2, 2]
+
+决策树（同层跳过重复元素）：
+        []
+    /   |   \
+  [1]  [2]  [2]  ← 同层两个2，只用第一个，第二个跳过
+  ...
+```
+
+```python
+def subsetsWithDup(nums):
+    nums.sort()                    # ⭐ 必须先排序
+    result = []
+    path = []
+
+    def dfs(start):
+        result.append(path[:])     # 每个节点都是一个子集
+
+        for i in range(start, len(nums)):
+            # 同层跳过重复元素
+            if i > start and nums[i] == nums[i-1]:
+                continue           # ⭐ 剪枝：同层相同元素跳过
+
+            path.append(nums[i])
+            dfs(i + 1)
+            path.pop()             # 回溯
+
+    dfs(0)
+    return result
+```
+
+**理解 `i > start and nums[i] == nums[i-1]`：**
+
+```
+i > start  → 说明是同一层的第2个或之后的元素（不是第一个）
+nums[i] == nums[i-1]  → 和前一个相同
+
+两个条件同时满足 → 是同层重复 → 跳过
+
+注意：i > 0（错误）vs i > start（正确）
+i > 0 会把不同层的相同元素也跳过，导致漏掉合法子集
+```
+
+---
+
+## 第三章：组合类题目
+
+### 3.1 组合的核心思路
+
+**组合 vs 排列：**
+
+```
+组合：[1,2] 和 [2,1] 是同一个 → 不关心顺序
+排列：[1,2] 和 [2,1] 是两个不同结果 → 关心顺序
+```
+
+**组合的关键设计：用 `start` 控制从哪里开始选，避免重复。**
+
+```
+每次递归从 start 开始往后选，不回头
+→ 保证同一个组合不会被选两次
+
+路径长度用 path 的 len 控制，达到目标 size 就收集
+```
+
+---
+
+### 3.2 LC 39 组合总和（元素可重复使用）
+
+**题目**：数组无重复元素，每个元素可以用无数次，找所有组合使得和等于 target。
+
+```python
+def combinationSum(candidates, target):
+    candidates.sort()
+    result = []
+    path = []
+
+    def dfs(start, remaining):
+        if remaining == 0:         # base case：恰好凑满
+            result.append(path[:])
+            return
+
+        for i in range(start, len(candidates)):
+            if candidates[i] > remaining:
+                break              # 剪枝：后面的更大，不可能凑满
+
+            path.append(candidates[i])
+            dfs(i, remaining - candidates[i])   # ⭐ i 不是 i+1，可以重复用自己
+            path.pop()
+
+    dfs(0, target)
+    return result
+```
+
+**为什么 `dfs(i, ...)` 不是 `dfs(i+1, ...)`？**
+
+```
+i   → 当前元素可以再次被选（元素可重复使用）
+i+1 → 当前元素只用一次，下一层从下一个开始
+```
+
+---
+
+### 3.3 LC 40 组合总和 II（元素不可重复使用，结果去重）
+
+**题目**：数组有重复元素，每个元素只能用一次，找所有组合使得和等于 target，去除重复组合。
+
+```python
+def combinationSum2(candidates, target):
+    candidates.sort()              # ⭐ 先排序
+    result = []
+    path = []
+
+    def dfs(start, remaining):
+        if remaining == 0:
+            result.append(path[:])
+            return
+
+        for i in range(start, len(candidates)):
+            if candidates[i] > remaining:
+                break
+
+            # 同层去重（和 LC 90 子集 II 一样的技巧）
+            if i > start and candidates[i] == candidates[i-1]:
+                continue
+
+            path.append(candidates[i])
+            dfs(i + 1, remaining - candidates[i])  # ⭐ i+1，每个元素只用一次
+            path.pop()
+
+    dfs(0, target)
+    return result
+```
+
+---
+
+## 第四章：排列类题目
+
+### 4.1 LC 46 全排列（无重复数值）
+
+**题目**：给无重复数字的数组，返回所有全排列。
+
+**排列 vs 组合的关键区别：**
+
+```
+组合：用 start，每次从后面选，不回头
+排列：每次从全部未用的元素中选，需要 used 数组标记
+```
+
+**状态空间不能变，要变换回去（你的笔记）：**
+
+```
+做选择时：used[i] = True，path.append(nums[i])
+撤销选择时：used[i] = False，path.pop()        ← 恢复现场
+```
+
+```python
+def permute(nums):
+    result = []
+    path = []
+    used = [False] * len(nums)    # ⭐ 标记每个元素是否已在路径中
+
+    def dfs():
+        if len(path) == len(nums): # base case：路径长度等于数组长度
+            result.append(path[:])
+            return
+
+        for i in range(len(nums)):
+            if used[i]:
+                continue           # 已在路径中，跳过
+
+            used[i] = True         # 做选择
+            path.append(nums[i])
+            dfs()
+            path.pop()             # 撤销选择（回溯）
+            used[i] = False        # 恢复状态
+
+    dfs()
+    return result
+```
+
+**决策树（nums=[1,2,3]）：**
+
+```
+                []
+         /      |      \
+       [1]     [2]     [3]
+      /   \   /   \   /   \
+   [1,2][1,3][2,1][2,3][3,1][3,2]
+    |    |    |    |    |    |
+  [1,2,3]... (共 6 个叶子节点)
+```
+
+---
+
+### 4.2 LC 47 全排列 II（有重复数值，结果去重）
+
+**题目**：数组有重复数字，返回所有不重复的全排列。
+
+**去重策略：先排序 + 同层跳过重复元素。**
+
+```
+正序遍历时去重（常用）：
+  条件：i > 0 and nums[i] == nums[i-1] and not used[i-1]
+  含义：当前元素和前一个相同，且前一个没有被使用（说明在同一层）
+
+逆序思维理解：
+  used[i-1] == True  → 前一个在当前路径里（不同层），允许使用
+  used[i-1] == False → 前一个不在路径里（同一层），跳过重复
+```
+
+```python
+def permuteUnique(nums):
+    nums.sort()                    # ⭐ 先排序，让重复元素相邻
+    result = []
+    path = []
+    used = [False] * len(nums)
+
+    def dfs():
+        if len(path) == len(nums):
+            result.append(path[:])
+            return
+
+        for i in range(len(nums)):
+            if used[i]:
+                continue
+
+            # ⭐ 去重：同层跳过重复元素
+            if i > 0 and nums[i] == nums[i-1] and not used[i-1]:
+                continue
+
+            used[i] = True
+            path.append(nums[i])
+            dfs()
+            path.pop()
+            used[i] = False
+
+    dfs()
+    return result
+```
+
+**正序 vs 逆序去重对比（你的笔记）：**
+
+```
+正序去重（not used[i-1]）：前一个没用 → 跳过（常用，推荐）
+逆序去重（used[i-1]）：前一个用了 → 跳过（等价，但逻辑反过来）
+
+两种写法等价，选一种记住即可。
+```
+
+---
+
+## 第五章：递归经典题
+
+### 5.1 递归逆序一个栈
+
+**题目**：只用递归函数和栈本身的操作，逆序一个栈（不能用额外数据结构）。
+
+**思路**：先写一个辅助函数 `getBottom(stack)`，每次取出栈底元素，然后递归逆序剩余部分，最后把栈底元素压到栈顶。
+
+```python
+def getBottom(stack):
+    """取出并返回栈底元素，其余元素顺序不变"""
+    top = stack.pop()
+    if not stack:             # base case：栈只剩一个元素，它就是栈底
+        return top
+    bottom = getBottom(stack) # 递归取出真正的栈底
+    stack.append(top)         # 把之前弹出的元素放回去
+    return bottom
+
+def reverse(stack):
+    """递归逆序栈"""
+    if not stack:             # base case：栈空，直接返回
+        return
+    bottom = getBottom(stack) # 取出栈底元素
+    reverse(stack)            # 递归逆序剩余部分
+    stack.append(bottom)      # 把原来的栈底压到栈顶
+```
+
+**图解（stack = [1,2,3]，1在栈顶）：**
+
+```
+原始：  栈顶 → [1, 2, 3] ← 栈底
+
+getBottom 取出 3（栈底）
+reverse([1, 2])
+  getBottom 取出 2
+  reverse([1])
+    getBottom 取出 1（此时栈空，base case）
+    return 1
+  stack.append(2) → [2]
+  stack.append(1) → [2, 1]
+stack.append(3) → [2, 1, 3]
+
+等等... 实际结果是 [3, 2, 1]，即逆序 ✅
+```
+
+---
+
+### 5.2 用递归给栈排序
+
+**题目**：只用递归，将栈从栈顶到栈底按从小到大排序。
+
+**思路**：先递归排好除栈顶外的部分，然后把栈顶元素插入到合适的位置。
+
+```python
+def insertSorted(stack, val):
+    """把 val 插入已排序的栈中（栈顶小，栈底大）"""
+    if not stack or stack[-1] <= val:
+        stack.append(val)      # base case：栈空或栈顶更小，直接放
+        return
+    top = stack.pop()
+    insertSorted(stack, val)   # 递归找到合适位置插入
+    stack.append(top)          # 把之前弹出的元素放回
+
+def sortStack(stack):
+    """递归排序栈"""
+    if not stack:
+        return
+    top = stack.pop()
+    sortStack(stack)           # 先排好剩余部分
+    insertSorted(stack, top)   # 再把 top 插入合适位置
+```
+
+---
+
+### 5.3 汉诺塔问题
+
+**题目**：n 个圆盘在柱子 A，借助柱子 B，把所有圆盘移到柱子 C，大盘不能在小盘上面。
+
+**递归思路：**
+
+```
+f(n, from, to, aux) = 把 n 个盘从 from 移到 to，借助 aux
+
+步骤：
+  1. 把上面 n-1 个盘从 from 移到 aux（借助 to）
+  2. 把最大的盘从 from 移到 to
+  3. 把 n-1 个盘从 aux 移到 to（借助 from）
+
+base case：
+  n == 1 → 直接把这个盘从 from 移到 to
+```
+
+```python
+def hanoi(n, frm, to, aux):
+    if n == 1:                          # base case
+        print(f"Move disk 1 from {frm} to {to}")
+        return
+
+    hanoi(n-1, frm, aux, to)           # 步骤1：n-1 个盘移到辅助柱
+    print(f"Move disk {n} from {frm} to {to}")  # 步骤2：最大盘移到目标
+    hanoi(n-1, aux, to, frm)           # 步骤3：n-1 个盘移到目标柱
+
+hanoi(3, 'A', 'C', 'B')
+```
+
+**最优移动次数：2^n - 1**
+
+```
+n=1 → 1 次
+n=2 → 3 次
+n=3 → 7 次
+n=k → 2^k - 1 次
+```
+
+**递推关系：T(n) = 2 × T(n-1) + 1**
+
+```
+移动 n 个盘 = 移动 n-1 个盘两次 + 移动最大盘 1 次
+```
+
+---
+
+## 第六章：总结与选题指南
+
+### 6.1 递归题型分类全景
+
+```
+递归
+  │
+  ├── 不带路径（子问题独立，可 DP）
+  │     ├── 斐波那契、爬楼梯
+  │     ├── 最小路径和、LCS
+  │     └── → 加 memo → 改成 DP
+  │
+  └── 带路径（子问题依赖路径，不能 DP）
+        │
+        ├── 需要枚举所有路径（回溯）
+        │     ├── 子集 / 子序列  (要或不要)
+        │     ├── 组合            (start 控制起点)
+        │     ├── 排列            (used 数组)
+        │     └── 矩阵路径搜索   (visited 矩阵)
+        │
+        └── 只需找一条路径（DFS）
+              ├── 树的遍历
+              ├── 图的连通性
+              └── 单词搜索（79）
+```
+
+---
+
+### 6.2 回溯模板（通用）
+
+```python
+def backtrack(选择列表, 路径):
+    # 1. 终止条件
+    if 满足结束条件:
+        收集结果（path 的深拷贝）
+        return
+
+    # 2. 遍历选择
+    for 选择 in 选择列表:
+        if 不合法（剪枝）:
+            continue
+
+        做选择（修改状态）
+        backtrack(更新后的选择列表, 路径)
+        撤销选择（恢复状态）  ← 回溯的核心
+```
+
+---
+
+### 6.3 三类题目的关键区别
+
+| 题型 | 关键变量 | 去重方式 | 示例题 |
+|------|---------|---------|--------|
+| **子集** | `start`（从哪开始选）| 排序 + `i > start and nums[i]==nums[i-1]` | LC 78, 90 |
+| **组合** | `start` + `remaining`（还差多少）| 排序 + 同层跳过 | LC 39, 40 |
+| **排列** | `used[]`（哪些用过）| 排序 + `not used[i-1]` | LC 46, 47 |
+
+---
+
+### 6.4 终止条件速查表
+
+| 问题类型 | 终止条件 | 收集时机 |
+|---------|---------|---------|
+| 子序列 / 子集 | `i == len(s 或 nums)` | 进入就收集（每个节点） |
+| 组合 | `remaining == 0` 或 `len(path) == k` | 只在满足条件时收集 |
+| 排列 | `len(path) == len(nums)` | 只在路径长度达到时收集 |
+| 树的遍历 | `node is None` | 视题目而定 |
+| 矩阵搜索 | 越界 or 不匹配 | 匹配完整单词时收集 |
+
+---
+
+### 6.5 以上题目没有涉及 DFS 和 BFS 吗？
+
+**你的问题**：以上题目并没有设计 DFS 和 BFS？
+
+实际上全部子集、组合、排列这些题**都是 DFS**，只是作用在"决策树"上而不是图或矩阵上：
+
+```
+DFS 作用的对象可以是：
+  ├── 二叉树（left/right 两个方向）
+  ├── 图/矩阵（上下左右四个方向）
+  └── 决策树（做选择/不做选择，或选哪个元素）← 子集/组合/排列都在这里
+
+BFS 只用于需要"最短路径"或"按层处理"的场景。
+决策树的问题不需要最短路径，所以用 DFS，不用 BFS。
+```
+
+**为什么决策树不用 BFS？**
+
+```
+BFS 适合：找最短路径，按层返回结果
+子集/排列：要找所有路径，不关心层数，DFS 天然更合适
+```
+
+---
+
+*最后更新：第一章完成*
+
+---
+
+## 第七章：练习代码整理（组合 + 排列）
+
+### 7.1 LC 77 组合
+
+**题目**：从 `1` 到 `n` 中选 `k` 个数，返回所有组合。
+
+**关键点**：
+- 终止条件是 `len(path) == k`
+- `for` 从 `start_index` 到 `n+1`（包含 n）
+- 递归传 `i+1`，每个数只用一次
+- 不需要排序，不需要去重
+
+```python
+def combine(self, n, k):
+    res = []
+    path = []
+
+    def backtracking(start_index):
+        if len(path) == k:
+            res.append(path[:])
+            return
+
+        for i in range(start_index, n + 1):
+            path.append(i)
+            backtracking(i + 1)
+            path.pop()
+
+    backtracking(1)
+    return res
+```
+
+---
+
+### 7.2 LC 39 组合总和
+
+**题目**：`candidates` 无重复，每个元素可以用无数次，找所有和等于 `target` 的组合。
+
+**关键点**：
+- 必须排序，`break` 剪枝才能正确工作
+- 递归传 `i`（不是 `i+1`），允许重复使用自己
+- 不需要去重
+
+**我出错的地方**：
+1. 没有排序，导致 `break` 提前终止跳过合法组合
+2. 递归传了 `start_i` 而不是 `i`，导致死循环
+
+```python
+def combinationSum(self, candidates, target):
+    candidates.sort()          # ⚠️ 必须排序
+    res = []
+    path = []
+
+    def backtracking(start_i):
+        if sum(path) == target:
+            res.append(path[:])
+            return
+
+        for i in range(start_i, len(candidates)):
+            if sum(path) + candidates[i] > target:
+                break          # 剪枝（排序后才有效）
+
+            path.append(candidates[i])
+            backtracking(i)    # ⚠️ 传 i，不是 i+1，允许重复用
+            path.pop()
+
+    backtracking(0)
+    return res
+```
+
+**`backtracking(i)` vs `backtracking(i+1)`：**
+
+```
+backtracking(i)   → 下层还能选自己，元素可重复使用   LC 39
+backtracking(i+1) → 下层从下一个开始，每个元素只用一次 LC 40, 77
+```
+
+---
+
+### 7.3 LC 40 组合总和 II
+
+**题目**：`candidates` 有重复元素，每个元素只能用一次，结果去重。
+
+**关键点**：
+- 必须排序
+- 递归传 `i+1`，每个元素只用一次
+- 需要去重：`if i > start_index and candidates[i] == candidates[i-1]: continue`
+
+**`i > start_index` 的含义**：
+
+```
+start_index = 当前层 for 循环的起点（分支的那个点）
+
+i == start_index → 这层第一个元素，无论重不重复都可以选
+i >  start_index → 这层第二个或之后，重复了就跳过
+
+i > 0 是错的：会跨层跳过合法结果
+i > start_index 才对：只跳同层重复
+```
+
+```python
+def combinationSum2(self, candidates, target):
+    candidates.sort()          # ⚠️ 必须排序
+    res = []
+    path = []
+
+    def backtracking(start_index):
+        if sum(path) == target:
+            res.append(path[:])
+            return
+
+        for i in range(start_index, len(candidates)):
+            if sum(path) + candidates[i] > target:
+                break
+
+            if i > start_index and candidates[i] == candidates[i-1]:  # ⚠️ 去重
+                continue
+
+            path.append(candidates[i])
+            backtracking(i + 1)
+            path.pop()
+
+    backtracking(0)
+    return res
+```
+
+---
+
+### 7.4 LC 46 全排列
+
+**题目**：无重复数字的数组，返回所有全排列。
+
+**关键点**：
+- 用 `used[]` 记录当前路径用了哪些，防止同一元素出现两次
+- `for` 每次从 `0` 开始扫全部（不用 `start_index`）
+- 不需要排序，不需要去重
+
+**我出错的地方**：
+1. `used[i] == False`（比较）写成了赋值，`used` 没被重置，所有排列丢失
+2. `if used` 判断整个列表非空（永远 True），应该是 `if used[i]`
+
+```python
+def permute(self, nums):
+    res = []
+    path = []
+    used = [False] * len(nums)
+
+    def backtracking():
+        if len(path) == len(nums):
+            res.append(path[:])
+            return
+
+        for i in range(len(nums)):
+            if used[i]:
+                continue
+
+            used[i] = True         # 做选择
+            path.append(nums[i])
+            backtracking()
+            path.pop()             # 撤销选择
+            used[i] = False        # ⚠️ = 不是 ==
+
+    backtracking()
+    return res
+```
+
+---
+
+### 7.5 LC 47 全排列 II
+
+**题目**：有重复数字的数组，返回所有不重复的全排列。
+
+**关键点**：
+- 必须排序
+- 去重条件：`if i > 0 and nums[i] == nums[i-1] and not used[i-1]: continue`
+
+**`not used[i-1]` 的含义**：
+
+```
+used[i-1] = False → 前一个没在路径里 → 同层重复 → 跳过
+used[i-1] = True  → 前一个在路径里   → 不同层   → 允许
+
+例子：nums = [1,1,2]
+第一层 for：
+  i=0, 选第一个1，used=[T,F,F]，进入下层...
+  回溯，used=[F,F,F]
+  i=1, nums[1]==nums[0]，used[0]=False → not used[0]=True → 跳过 ✅
+
+在 path=[1] 的分支里，第二层 for：
+  i=1, nums[1]==nums[0]，used[0]=True → not used[0]=False → 不跳过 ✅
+```
+
+```python
+def permuteUnique(self, nums):
+    nums.sort()                    # ⚠️ 必须排序
+    res = []
+    path = []
+    used = [False] * len(nums)
+
+    def backtracking():
+        if len(path) == len(nums):
+            res.append(path[:])
+            return
+
+        for i in range(len(nums)):
+            if used[i]:
+                continue
+
+            if i > 0 and nums[i] == nums[i-1] and not used[i-1]:  # ⚠️ 去重
+                continue
+
+            used[i] = True
+            path.append(nums[i])
+            backtracking()
+            path.pop()
+            used[i] = False
+
+    backtracking()
+    return res
+```
+
+---
+
+### 7.6 组合 vs 排列 完整对比总结
+
+**核心区别：**
+
+```
+组合：结果不关心顺序，[1,2] 和 [2,1] 是同一个
+     → 用 start_index，只往后选，不回头
+
+排列：结果关心顺序，[1,2] 和 [2,1] 是两个不同结果
+     → 用 used[]，每次从头扫，跳过已用的
+```
+
+**五道题对比：**
+
+| | LC 77 | LC 39 | LC 40 | LC 46 | LC 47 |
+|--|--|--|--|--|--|
+| 类型 | 组合 | 组合 | 组合 | 排列 | 排列 |
+| 控制方式 | `start_index` | `start_index` | `start_index` | `used[]` | `used[]` |
+| 终止条件 | `len==k` | `sum==target` | `sum==target` | `len==n` | `len==n` |
+| 递归传参 | `i+1` | `i`（可重复）| `i+1` | 无参数 | 无参数 |
+| 需要排序 | ❌ | ✅ | ✅ | ❌ | ✅ |
+| 需要去重 | ❌ | ❌ | ✅ | ❌ | ✅ |
+
+**去重条件对比：**
+
+```
+组合去重：if i > start_index and candidates[i] == candidates[i-1]
+          → start_index 天然表示同层起点
+
+排列去重：if i > 0 and nums[i] == nums[i-1] and not used[i-1]
+          → 没有 start_index，靠 used[i-1] 判断同层
+```
+
+**通用回溯模板：**
+
+```python
+def backtracking(start_index):   # 组合用
+def backtracking():               # 排列用
+
+    # 1. 终止条件
+    if 满足条件:
+        res.append(path[:])      # ⚠️ 必须深拷贝，不能直接 append(path)
+        return
+
+    for i in range(start, end):
+        if 剪枝条件: break       # ⚠️ 排好序才能用 break
+        if 去重条件: continue
+
+        # 2. 做选择
+        path.append(x)
+        used[i] = True           # 排列才需要
+
+        # 3. 递归
+        backtracking(...)
+
+        # 4. 撤销（和做选择的顺序相反）
+        path.pop()
+        used[i] = False          # 排列才需要，⚠️ = 不是 ==
+```
+
+**常见 bug 汇总：**
+
+```
+1. used[i] == False   → 应该是 used[i] = False（== 是比较不是赋值）
+2. if used            → 应该是 if used[i]（不是判断列表非空）
+3. backtracking(start_i) 没改成 backtracking(i) → 死循环（LC 39）
+4. i > 0 去重         → 应该是 i > start_index（组合）
+5. 忘记排序           → break 剪枝失效，结果缺失
+6. res.append(path)   → 应该是 res.append(path[:])（浅拷贝陷阱）
+```
+
+---
+
+*最后更新：第七章完成*
